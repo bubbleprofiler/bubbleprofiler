@@ -1,0 +1,15 @@
+# Config file for BubbleProfiler, providing imported targets
+# for the package.
+#
+# After successful configuration the following variables
+# will be defined:
+#
+# BubbleProfiler_VERSION           the version number of BubbleProfiler
+
+@PACKAGE_INIT@
+
+set_and_check(BubbleProfiler_INCLUDE_DIRS "@PACKAGE_BUBBLEPROFILER_INSTALL_INCLUDE_DIR@")
+
+if(NOT TARGET BubbleProfiler::bubbler AND NOT BubbleProfiler_BINARY_DIR)
+  include("@PACKAGE_BUBBLEPROFILER_INSTALL_CMAKE_DIR@/BubbleProfilerTargets.cmake")
+endif()

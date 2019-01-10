@@ -1,0 +1,45 @@
+stages:
+  - build
+  - test
+
+build:ubuntu:
+  stage: build
+  image: bubbleprofiler/bubbleprofiler-ci-ubuntu-gcc
+  only:
+    - development
+  script:
+    - (mkdir build || echo "build is cached")
+    - cd build
+    - cmake -DENABLE_COMPILER_WARNINGS:BOOL=ON ..
+    - make
+    - make examples
+  artifacts:
+    paths:
+      - build
+
+pages:
+  stage: test
+  image: bubbleprofiler/bubbleprofiler-ci-ubuntu-docs
+  only:
+   - development
+  script:
+   - cd build
+   - cmake -DENABLE_COMPILER_WARNINGS:BOOL=ON ..
+   - make docs
+   - mv docs/html ../public/
+  artifacts:
+    paths:
+    - public
+
+test:ubuntu:
+  stage: test
+  only:
+   - development
+  image: bubbleprofiler/bubbleprofiler-ci-ubuntu-gcc
+  script:
+    - cd build
+    - make check
+  artifacts:
+    paths:
+      - build/test/Testing/Temporary
+    when: always

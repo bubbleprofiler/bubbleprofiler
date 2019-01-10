@@ -1,0 +1,143 @@
+from __future__ import print_function
+
+import argparse
+from math import sqrt
+import os
+import subprocess
+
+# Various physical constants (GeV)
+vEW = 246.22 #0T Higgs VEV
+Mh = 125.1 #0T Higgs mass
+Mw = 80.385 #0T W mass
+Mz = 91.1876 #0T Z mass
+Mt = 173.34 #0T top quark mass
+
+# Dimensionless couplings derived from above constants
+g = (2.0*Mw)/vEW # SU2L gauge coupling
+gPrime = sqrt((4.0*(Mz**2 - Mw**2))/(vEW**2)) # U1Y gauge coupling
+h_t = (sqrt(2)*Mt)/vEW # Top quark coupling
+lambda_h = (Mh**2)/(2.0*vEW**2) # Higgs quartic coupling
+
+# Path to this script
+bp_bin_path = os.path.realpath(os.path.dirname(__file__))
+# Path to CLI tool
+cli_tool = bp_bin_path + "/run_cmd_line_potential@CMAKE_EXECUTABLE_SUFFIX@"
+
+# Returns a dict containing the potential string and the vacua locations
+def generate_potential(T, Tc, lambda_m, lambda_s):
+    # Coefficients for leading order / 1 loop temperature correction
+    c_h = (1.0/48.0)*(9*(g**2) + 3*(gPrime**2) + 2*(6*h_t + 12*lambda_h + lambda_m));
+    c_s = (1.0/12.0)*(2*lambda_m + 3*lambda_s)
+
+    # Temperature dependence of Higgs VEV
+    v = lambda T: sqrt(vEW**2 - (c_h/lambda_h)*T**2)
+
+    # Temperature dependence of Higgs mass
+    m_h = lambda T: sqrt(2.0*lambda_h*(v(T)**2))
+
+    # Singlet mass at critical temperature
+    m_s_Tc = sqrt(((v(Tc)**2)/2)*(lambda_m - 2*sqrt(lambda_h*lambda_s)));
+
+    # Temperature dependence of singlet mass
+    m_s = lambda T: sqrt(m_s_Tc**2 + (((lambda_m*c_h)/(2*lambda_h)) - c_s)*(Tc**2 - T**2))
+
+    # Effective coupling
+    lambda_e_sq = (m_s_Tc**4 - lambda_m*(v(Tc)**2)*m_s_Tc**2)/(v(Tc)**4)
+
+    # Temperature dependence of singlet VEV
+    w = lambda T: sqrt((m_h(T)**2 * (lambda_m*v(T)**2 - 2*m_s(T)**2)) /
+                       (v(T)**2 * (4*lambda_e_sq + lambda_m**2)))
+
+    # Shape parameters
+    Rh = (m_h(Tc)**2)/(w(Tc)**2)
+    Rs = (m_s_Tc**2)/(v(Tc)**2)
+
+    # We can now check that lambda_s satisfies the conditions to have a
+    # barrier between the vacua at Tc
+    lambda_smin = (4.0/lambda_h)*(2*c_h**2 - lambda_h*(lambda_m/6.0)
+        - 2*c_h*sqrt(c_h**2 - lambda_h*(lambda_m/6.0)))
+    lambda_smax = (lambda_m**2)/(4*lambda_h)
+
+    if (lambda_s < lambda_smin) or (lambda_s > lambda_smax):
+        raise Exception("Error: for these parameters, lambda_s must be "
+                        "in the interval ({}, {}) to obtain a barrier "
+                        "between vacua at the critical temperature".format(
+            lambda_smin, lambda_smax))
+
+
+    potential_str = "(1.0/8.0)*{m_h_Tc}^2*{v_Tc}^2*(" \
+                    "(4*{Rs}*h^2*s^2)/({Rh}*{v_Tc}^2*{w0}^2) + " \
+                    "((h^2)/({v_Tc}^2) + (s^2)/({w0}^2) - 1)^2) " \
+                    "- (1.0/2.0)*({Tc}^2 - {T}^2)*({c_h}*h^2 + {c_s}*s^2)"
+
+    return {
+        "true_vac" : (v(T), 0),
+        "false_vac" : (0, w(T)),
+        "order_param" : v(Tc) / Tc,
+        "potential_str" : potential_str.format(
+            m_h_Tc=m_h(Tc), v_Tc=v(Tc), Rs=Rs, Rh=Rh, w0=w(Tc), Tc=Tc, T=T, c_h=c_h, c_s=c_s
+        )
+    }
+
+def run_profiler(data, step_size=0.0001, verbose=False):
+    """
+    :param data: output of generate_potential...
+    :return: dict containing "cli_output","action"
+    """
+    command = [
+        cli_tool,
+        "--field", "h",
+        "--field", "s",
+        "--global-minimum", str(data["true_vac"][0]), str(data["true_vac"][1]),
+        "--local-minimum", str(data["false_vac"][0]), str(data["false_vac"][1]),
+        "--output-path", "output",
+        "--force-output",
+        "--initial-step-size", str(step_size),
+        #"--verbose",
+        "--potential", data["potential_str"]
+    ]
+
+    if verbose:
+        command = command + ["--verbose"]
+    #print "COMMAND: " + " ".join(command)
+
+    cli_output = subprocess.check_output(command).splitlines()
+
+    action = None
+
+    for entry in cli_output:
+        if entry.startswith("# Action"):
+            action = float(entry.split(" ")[2])
+
+    return {"cli_output" : cli_output, "action": action}
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='SM + singlet: Z2-symmetric example from arxiv:1107.5441')
+
+    parser.add_argument('-T', '--temp', type=float, required=True,
+                        help='create potential at this temperature')
+    parser.add_argument('-Tc', '--crit-temp', type=float, required=True,
+                        help='critical temperature for this potential')
+    parser.add_argument('--lambda-m', type=float, required=True,
+                        help='mixed quartic coupling parameter')
+    parser.add_argument('--lambda-s', type=float, required=True,
+                        help='singlet quartic coupling parameter')
+    parser.add_argument('--step-size', type=float, default=0.0001,
+                        help='step-size to use in integration')
+    parser.add_argument('--verbose', action='store_true',
+                        help='produce verbose output')
+
+    args = parser.parse_args()
+
+    potential_data = generate_potential(args.temp, args.crit_temp, args.lambda_m, args.lambda_s)
+
+    output = run_profiler(potential_data, args.step_size, args.verbose)
+
+    print(output["action"])
+
+
+
+
+
+

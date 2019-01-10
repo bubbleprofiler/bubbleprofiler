@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# location of the executables
+BINDIR=$(echo "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@" | sed 's/ /\\\\ /g')
+RUN_POTENTIAL="${BINDIR}/run_cmd_line_potential@CMAKE_EXECUTABLE_SUFFIX@"
+
+${RUN_POTENTIAL} \
+         --potential "(x^2 + y^2 + z^2)*(0.0831826*(x - 1)^2 + 0.934068*(y - 1)^2 + 0.34766*(z -1)^2 - 0.328122)" \
+         --field x --field y --field z \
+         --force-output \
+         --output-path output \
+         --domain-start 10e-8 --initial-step-size 0.001 \
+         --local-minimum 0 0 0 \
+         --global-minimum 1.9388469562076833 1.045065997461013 1.1310410641729252

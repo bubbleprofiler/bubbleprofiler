@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# location of this script
+BASEDIR=$(dirname $0)
+ABSBASEDIR=$(cd "$BASEDIR"; pwd | sed 's/ /\\\\ /g')
+
+# location of the executables
+BINDIR=$(echo "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@" | sed 's/ /\\\\ /g')
+RUN_POTENTIAL="${BINDIR}/run_cmd_line_potential@CMAKE_EXECUTABLE_SUFFIX@"
+
+${RUN_POTENTIAL} \
+    --potential "0.36*x^2 - x^3 + 0.57*x^4" \
+    --field 'x' \
+    --force-output \
+    --output-path output \
+    --global-minimum 1.0 \
+    --local-minimum 0.0 \
+    --barrier 0.31579 \
+    --ansatz-file "${ABSBASEDIR}/AnsatzTab.csv" \
+    --write-profiles --perturbative

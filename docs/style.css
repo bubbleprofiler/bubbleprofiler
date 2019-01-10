@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css?family=Alegreya|Alegreya+Sans|Merriweather|Merriweather+Sans|Nunito|Nunito+Sans|Quattrocento|Quattrocento+Sans|Roboto|Roboto+Mono|Roboto+Slab');
+
+pre.fragment, td, script{
+  font-family: 'Roboto Mono', monospace;
+  font-size: 70 %;
+  color: #908568;
+}
+
+a.el {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 80%;
+}
+
+body, table, div, p, dl {
+  font-family: 'Alegreya', serif;
+}
+
+.title, h1, h2, h3, div.tabs, #projectname, #projectbrief, #MSearchField, .SelectItem, a.el, #projectnumber {
+  font-family: 'Alegreya Sans', sans-serif;
+  color: #E7976D; 
+}
+
+.tabs, .tabs2, .tabs3, .tablist li, .sm-dox li, .sm-dox  {
+  background-image: none;
+  background-color: #EBEFF6; 
+  font-family: 'Alegreya Sans', sans-serif;
+}
+
+.sm-dox a, .sm-dox a:focus, .sm-dox a:hover, .sm-dox a:active {
+  font-family: 'Alegreya Sans', serif !important;
+}
+
+.tablist a:hover, .sm-dox a:hover {
+  background-image: none;
+  background-color: #e9cec3;
+}
+
+.tablist li.current a, .sm-dox a.current, .sm-dox a.highlighted {
+  background-image: none;
+  background-color: #E7976D;
+}
+
+.tablist a, , .sm-dox a {
+  background-image: none;
+}
+
+#titlearea {
+  border-bottom: 1px solid #E7976D;
+}
+
