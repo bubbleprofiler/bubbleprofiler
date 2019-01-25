@@ -445,7 +445,25 @@ Note that performing an out-of-source build in a separate build directory as
 illustrated above is recommended, but not compulsory.  The resulting library
 and executable are located in the \code{lib/} and \code{bin/}
 subdirectories of the main package directory, respectively.
-\bp is provided with a suite of unit tests that may be used to
+
+Simple potentials can be run very quickly using the command line
+interface \code{bin/run_cmd_line_potential.x} executable.  For example:
+
+\begin{lstlisting}[language={}]
+bin/run_cmd_line_potential.x  --potential '0.1*((-x + 2)^4 - 14*(-x + 2)^2 + 24*(-x + 2))' --field 'x' --local-minimum 0.0 --global-minimum 5.0 --n-dims 3 
+\end{lstlisting}
+%
+results in the output
+%
+\begin{lstlisting}[language={}]
+Potential: 0.1*((-x + 2)^4 - 14*(-x + 2)^2 + 24*(-x + 2))
+Field: x
+# Action: 54.112
+\end{lstlisting}
+More details about the command line interface are given in
+\appref{sec:User-Options}.
+
+\bp is also distributed with a suite of unit tests that may be used to
 check that the compiled library behaves as expected by running the command:
 \begin{lstlisting}[language=bash]
 $ make check
