@@ -2104,15 +2104,16 @@ The main user interface for \bp is the \code{bin/run_cmd_line_potential.x} tool.
 An example command demonstrating the minimal required inputs is:
 
 \begin{lstlisting}[language={}]
-run_cmd_line_potential.x --potential "(x^2 + y^2)*(1.8*(x - 1)^2 + 0.2*(y - 1)^2 - 0.3)" --field "x" --field "y" --false-vacuum-at-origin --global-minimum 1.046372380884969 1.6634936817718957 --output output/
+run_cmd_line_potential.x --potential "(x^2 + y^2)*(1.8*(x - 1)^2 + 0.2*(y - 1)^2 - 0.3)" --field "x" --field "y" --false-vacuum-at-origin --global-minimum 1.0402967171 1.53520719837
 \end{lstlisting}
-
+%
 which results in output
-
+%
 \begin{lstlisting}[language={}]
+Potential: (x^2 + y^2)*(1.8*(x - 1)^2 + 0.2*(y - 1)^2 - 0.3)  
 Field: x
 Field: y
-# Action: 20.8361
+# Action: 20.8363
 \end{lstlisting}
 
 A comprehensive set of options allows the user to choose which algorithms will
