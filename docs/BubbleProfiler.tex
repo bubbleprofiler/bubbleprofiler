@@ -312,8 +312,8 @@ depends upon the maximum temperature in our cosmic history
 \cite{Degrassi:2012ry,Rose:2015lna}.
 
 Efficient publicly available codes exist for calculating the critical
-temperature of a phase transition \cite{Basler:2018cwe}. However, the accurate
-treatment of false vacuum decay is, unfortunately,
+temperature of a phase transition \cite{Basler:2018cwe}. However, the
+accurate treatment of false vacuum decay is, unfortunately,
 generically a numerically expensive problem.  Two publicly available
 codes exist for calculating the decay of the false vacuum: \cosmo,
 which is currently utilized by \vevac
@@ -321,11 +321,11 @@ which is currently utilized by \vevac
 \cite{Masoumi:2016wot}.  \cosmo solves the bounce action using a path
 deformation method, while \ab uses a multiple shooting method; we
 discuss both of these methods in more detail in \secref{sec:tests}.
-Various alternative methods for finding the bounce action have also been
-proposed in the literature.  Since the action has a saddle point at
-the bounce solution, which is a maximum with respect to dilatations,
-\refcite{Claudson:1983et} extremizes dilatations of the action
-appropriately to find the action at the bounce.  The authors of
+Various alternative methods for finding the bounce action have also
+been proposed in the literature.  Since the action has a saddle point
+at the bounce solution, which is a maximum with respect to
+dilatations, \refcite{Claudson:1983et} extremizes dilatations of the
+action appropriately to find the action at the bounce.  The authors of
 Refs. \cite{Kusenko:1995jv, Kusenko:1996jn, Moreno:1998bq} and
 \cite{John:1998ip} use optimization methods, by defining a
 minimization function that describes departures from a modified
@@ -339,11 +339,13 @@ ascent/descent method to find the bounce.  In
 by approximating the potential by a polygon.
 \refcite{Espinosa:2018hue} generalizes the single field, thin-wall
 case by introducing a tunneling potential that connects smoothly the
-false and true vacua.  The bounce action then is expressed as a simple
-integral of the tunneling potential.  For the single field case,
-machine learning techniques are used to find the bounce in
-\refcite{Jinno:2018jov}.  Finally, and of greatest relevance in the following,
-a new perturbative method was proposed in \refcite{Akula:2016gpl}.
+false and true vacua and this method was very recently extended to the
+multi-field case \cite{Espinosa:2018szu}.  The bounce action then is
+expressed as a simple integral of the tunneling potential.  For the
+single field case, machine learning techniques are used to find the
+bounce in \refcite{Jinno:2018jov}.  Finally, and of greatest relevance
+in the following, a new perturbative method was proposed in
+\refcite{Akula:2016gpl}.
 
 In this work we present our own easy to use
 bounce solver \bp, which implements the algorithm in
