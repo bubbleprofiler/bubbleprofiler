@@ -215,7 +215,7 @@ directory and running CMake, where we direct CMake to use the C and
 C++ compilers installed using homebrew,
 
     cd /path/to/build/directory
-    CC=clang-3.8 CXX=clang++-3.8 cmake /path/to/source/directory
+    CC=clang CXX=clang++ cmake /path/to/source/directory
 
 The main package components may then be built by typing
 
