@@ -17,11 +17,7 @@
 
 #include "gaussian_potential.hpp"
 #include "profile_guesser.hpp"
-
-#define private public
 #include "kink_profile_guesser.hpp"
-#undef private
-
 #include "field_profiles.hpp"
 #include "perturbative_profiler.hpp"
 
@@ -98,7 +94,7 @@ int main(int argc, const char* argv[])
    Field_profiles ansatz = guesser->get_profile_guess(
       potential, true_vacuum, input.n_fields, -1.0, -1.0, 1.e-3, 100);
 
-   double alpha = kink_guesser->alpha;
+   double alpha = kink_guesser->get_alpha();
    std::cout << "Alpha: " << alpha << '\n';
 
    RK4_perturbative_profiler profiler;

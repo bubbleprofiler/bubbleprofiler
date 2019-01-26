@@ -98,6 +98,36 @@ public:
     */
    void set_min_domain_end(double r);
 
+   /*!
+    * @brief returns the calculated value of the parameter alpha
+    * @return the value of alpha for the fitted one-dimensional potential
+    */
+   double get_alpha() const { return alpha; }
+
+   /*!
+    * @brief returns the calculated value of the parameter |E|
+    * @return the value of |E| for the fitted one-dimensional potential
+    */
+   double get_aE() const { return aE; }
+
+   /*!
+    * @brief returns the value of phi0 used in the initial ansatz
+    * @return the value of phi0 used in the initial ansatz
+    */
+   double get_phi0() const { return phi0; }
+
+   /*!
+    * @brief returns the value of delta used in the initial ansatz
+    * @return the value of delta used in the initial ansatz
+    */
+   double get_delta() const { return delta; }
+
+   /*!
+    * @brief returns the value of lw used in the initial ansatz
+    * @return the value of lw used in the initial ansatz
+    */
+   double get_lw() const { return lw; }
+
 private:
    /*! Values of alpha used for interpolation in 3 spacetime dimensions */
    const static std::array<double,46> alpha_grid_3d;
