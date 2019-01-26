@@ -49,7 +49,7 @@ public:
    virtual ~Algebraic_potential() = default;
 
    //! Get a fresh copy of this potential
-   Algebraic_potential * clone() const {
+   virtual Algebraic_potential * clone() const override {
       return new Algebraic_potential(*this);
    }
 

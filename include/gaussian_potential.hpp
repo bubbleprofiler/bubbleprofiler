@@ -67,7 +67,7 @@ public:
     * @brief return a copy of this potential
     * @return a copy of this object
     */
-   Gaussian_potential * clone() const {
+   virtual Gaussian_potential * clone() const override {
       return new Gaussian_potential(*this);
    };
 
