@@ -16,7 +16,7 @@ matrix:
             - libeigen3-dev
             - libginac-dev
             - libnlopt-dev
-            - libgsl-dev
+            - libgsl0-dev
       compiler: gcc
       env:
         - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
@@ -34,7 +34,7 @@ matrix:
             - libeigen3-dev
             - libginac-dev
             - libnlopt-dev
-            - libgsl-dev
+            - libgsl0-dev
       env:
         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
