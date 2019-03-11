@@ -54,4 +54,4 @@ or pass the \_GLIBCXX\_USE\_CXX11\_ABI=0 flag during the cmake step:
     cmake -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_CXX11_ABI=0 ..
 
 
-[BubbleProfiler development repository]: https://gitlab.com/freeboson/BubbleProfiler/issues
+[BubbleProfiler development repository]: https://github.com/bubbleprofiler/bubbleprofiler/issues
