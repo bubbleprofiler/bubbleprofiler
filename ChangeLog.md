@@ -1,3 +1,3 @@
-BubbleProfiler-1.0.0 [not released yet]
+BubbleProfiler-1.0.0 [January 10, 2019]
 =======================================
  * Initial release
