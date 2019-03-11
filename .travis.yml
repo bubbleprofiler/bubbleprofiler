@@ -47,5 +47,5 @@ script:
     cmake -DENABLE_COMPILER_WARNINGS:BOOL=ON \
           -DENABLE_TESTING:BOOL=ON ..
   - make
-  - ctest --output-on-failure
+  - make check
   - make examples
