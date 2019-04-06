@@ -277,9 +277,9 @@ Shooting::evolve_type Shooting::evolve(double lambda) const
 double Shooting::bubble_scale() const
 {
    const double mass_squared = potential_second(barrier);
-   if(mass_squared > 0) {
+   if(mass_squared >= 0.0 || std::isnan(mass_squared) || std::isinf(mass_squared)  ) {
       throw Numerical_error(
-         "Double derivative at the barrier (maxium of potential) is negative.");
+         "Double derivative at the barrier (a local maximum) is not a negative finite number.");
    }
    return 2. * Pi / Sqrt(-mass_squared);
 }
