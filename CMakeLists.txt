@@ -81,6 +81,7 @@ find_package(GiNaC REQUIRED)
 find_package(GSL 1.15 REQUIRED)
 find_package(NLopt REQUIRED)
 find_package(Threads REQUIRED)
+find_package(effpotential REQUIRED)
 
 # add compiler warnings if requested
 if(ENABLE_COMPILER_WARNINGS)
@@ -103,6 +104,7 @@ configure_file(
 add_library(bubbler
   src/action.cpp
   src/algebraic_potential.cpp
+  src/thermal_potential.cpp
   src/basic_logger.cpp
   src/euclidean_action.cpp
   src/field_profiles.cpp
@@ -127,6 +129,7 @@ add_library(bubbler
 set(bubbler_headers_to_install
   include/action.hpp
   include/algebraic_potential.hpp
+  include/thermal_potential.hpp
   include/basic_logger.hpp
   ${PROJECT_BINARY_DIR}/include/bubbleprofiler_version.hpp
   include/default_integration_policy.hpp
