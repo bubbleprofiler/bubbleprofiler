@@ -51,6 +51,10 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
             return T;
         }
 
+        std::shared_ptr<PhaseTracer::Effective_potential> get_effective_potential() {
+            return effective_potential;
+        }
+
     private:
         double renormalization_scale;
         std::size_t n_fields;
