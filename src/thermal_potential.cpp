@@ -5,24 +5,23 @@ namespace BubbleProfiler {
 double ThermalPotential::operator()(const Eigen::VectorXd& coords) const {
     Eigen::VectorXd internal_coords =
       (basis_transform * coords) + origin_translation;
-
-    // Hard to avoid without re writing EffectivePotential to be const friendly
-    return const_cast<ThermalPotential*>(this)->effective_potential.V(internal_coords, T);
+    
+    return effective_potential->V(internal_coords, T);
 }
 
 double ThermalPotential::partial(const Eigen::VectorXd& coords, int i) const {
     Eigen::VectorXd internal_coords =
       (basis_transform * coords) + origin_translation;
 
-    if (grad_cache_l == coords && !grad_cache_bad) {
+    if (!grad_cache_bad && grad_cache_l == coords) {
         return grad_cache_r(i);
     }
     else {
         grad_cache_bad = false;
         grad_cache_l = internal_coords;
-        Eigen::VectorXd grad = 
-            const_cast<ThermalPotential*>(this)->effective_potential.d2V_dxdt(internal_coords, T);
+        Eigen::VectorXd grad = effective_potential->d2V_dxdt(internal_coords, T);
         grad_cache_r = (basis_transform.transpose()) * grad;
+
         return grad_cache_r(i);
     }
 }
@@ -31,15 +30,15 @@ double ThermalPotential::partial(const Eigen::VectorXd& coords, int i, int j) co
     Eigen::VectorXd internal_coords =
       (basis_transform * coords) + origin_translation;
 
-    if (hess_cache_l == coords && !hess_cache_bad) {
+    if (!hess_cache_bad && hess_cache_l == coords) {
         return hess_cache_r(i, j);
     } 
     else {
         hess_cache_bad = false;
         hess_cache_l = internal_coords;
-        Eigen::VectorXd hess = 
-        const_cast<ThermalPotential*>(this)->effective_potential.d2V_dx2(internal_coords, T);
+        Eigen::VectorXd hess = effective_potential->d2V_dx2(internal_coords, T);
         hess_cache_r = (basis_transform.transpose()) * hess * basis_transform;
+
         return hess_cache_r(i, j);
     }
 }

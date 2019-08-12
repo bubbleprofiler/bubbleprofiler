@@ -9,8 +9,8 @@ class Simple2DPotential : public ThermalPotential {
   public:
     virtual ~Simple2DPotential() = default;
     Simple2DPotential() = default;
-    
-    Simple2DPotential(double m1_) {
+
+    Simple2DPotential(double m1_) : ThermalPotential(renorm_scale, 2) {
         m1 = m1_;
         l1 = 0.5*m1*m1/v2;
     }
@@ -34,6 +34,7 @@ class Simple2DPotential : public ThermalPotential {
     virtual std::vector<int> get_fermion_dof() override;
 
   private:
+    double renorm_scale = 246.;
     double v2=246.*246.;
     double m1=120.;
     double m2=50.;
