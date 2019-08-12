@@ -37,7 +37,6 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
         virtual void add_constant_term(double) override;
 
         void init_effective_potential() {
-            std::cout << n_fields;
             origin = Eigen::VectorXd::Zero(n_fields);
             origin_translation = origin;
             basis_transform = Eigen::MatrixXd::Identity(n_fields, n_fields);
