@@ -1,3 +1,6 @@
+#ifndef BUBBLEPROFILER_THERMAL_POTENTIAL_HPP_INCLUDED
+#define BUBBLEPROFILER_THERMAL_POTENTIAL_HPP_INCLUDED
+
 #include "libeffpotential/input_model.hpp"
 #include "libeffpotential/effective_potential.hpp"
 
@@ -11,6 +14,8 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
     public:
         virtual ~ThermalPotential() = default;
         
+        ThermalPotential() : effective_potential(PhaseTracer::Effective_potential(*this, renormalization_scale)) {}
+
         ThermalPotential(double renormalization_scale_) : 
             renormalization_scale(renormalization_scale_),
             effective_potential(PhaseTracer::Effective_potential(*this, renormalization_scale)) {
@@ -32,9 +37,17 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
         virtual void apply_basis_change(const Eigen::MatrixXd&) override;
         virtual void add_constant_term(double) override;
 
+        void set_temperature(double T_) {
+            T = T_;
+        }
+
+        double get_temperature() {
+            return T;
+        }
+
     private:
         std::size_t n_fields = 0;
-        double renormalization_scale;
+        double renormalization_scale = 246.22;
         double T = 0;
         PhaseTracer::Effective_potential effective_potential;
 
@@ -55,3 +68,5 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
 };
 
 }
+
+#endif

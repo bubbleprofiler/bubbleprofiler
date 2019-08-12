@@ -181,6 +181,7 @@ target_include_directories(bubbler
   ${NLopt_INCLUDE_DIRS}
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${BUBBLEPROFILER_INSTALL_INCLUDE_DIR}>
+  $<INSTALL_INTERFACE:include/libeffpotential>
 )
 
 target_link_libraries(bubbler
