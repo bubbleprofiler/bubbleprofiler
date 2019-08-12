@@ -11,7 +11,7 @@ class Simple2DPotential : public ThermalPotential {
     Simple2DPotential() = default;
     
     Simple2DPotential(double m1_) {
-        m1 = m1;
+        m1 = m1_;
         l1 = 0.5*m1*m1/v2;
     }
 
@@ -19,8 +19,8 @@ class Simple2DPotential : public ThermalPotential {
         return new Simple2DPotential(*this);
     };
 
-    virtual double V_tree(const Eigen::VectorXd &coords, double T) override;
-    virtual double V_daisy(const Eigen::VectorXd &coords, double T) override;
+    virtual double V_tree(const Eigen::VectorXd &coords, double) override;
+    virtual double V_daisy(const Eigen::VectorXd &coords, double) override;
     virtual std::size_t get_Ndim() override;
 
     virtual std::vector<double> get_squared_boson_masses(
@@ -43,6 +43,11 @@ class Simple2DPotential : public ThermalPotential {
     double mu2=mu*mu;
     double y1=0.1;
     double y2=0.15;
+
+    std::vector<int> boson_dof = {1,  1,  30 };
+    std::vector<double> boson_constants= {1.5,1.5,1.5};
+    std::vector<int> fermion_dof{};
+    size_t N_dim = 2;
 };
 
 }
