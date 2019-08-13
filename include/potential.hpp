@@ -20,6 +20,8 @@
 
 #include <cstddef>
 #include <Eigen/Core>
+#include <tuple>
+#include <vector>
 
 #include "error.hpp"
 
@@ -86,22 +88,27 @@ public:
    virtual void add_constant_term(double offset) = 0;
 
    //! Utility method for plotting 2d potentials.
-   Eigen::MatrixXd get_2d_potential_grid(unsigned int axis_size, double x_min, double x_max, double y_min, double y_max) {
+   std::vector<std::tuple<double, double, double>> get_2d_potential_grid(
+      unsigned int axis_size, double x_min, double x_max, double y_min, double y_max) {
+         
       if (get_number_of_fields() != 2) {
          throw Not_implemented_error("Can only get potential grid for 2 field potentials");
       }
       assert(x_min < x_max);
       assert(y_min < y_max);
 
-      Eigen::MatrixXd grid(axis_size, axis_size);
+      std::vector<std::tuple<double, double, double>> grid;
 
       double x_step = (x_max - x_min) / axis_size;
       double y_step = (y_max - y_min) / axis_size;
 
       for (unsigned int ix = 0; ix < axis_size; ix++) {
          for (unsigned int iy = 0; iy < axis_size; iy++) {
-            Eigen::Vector2d eval_coord(x_min + ix*x_step, y_min + iy*y_step);
-            grid(ix, iy) = (*this)(eval_coord);
+            double x = x_min + ix*x_step;
+            double y = y_min + iy*y_step;
+            Eigen::Vector2d eval_coord(x, y);
+            double z = (*this)(eval_coord);
+            grid.push_back(std::make_tuple(x, y, z));
          }
       }
       

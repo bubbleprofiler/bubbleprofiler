@@ -24,9 +24,6 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
                 // Here we have initialised the PhaseTracer effective potential, 
                 // which can access the Abstract_input_model methods (eventually)
                 // implemented by some concrete derived class of ThermalPotential.
-
-                double a;
-                a = 0;
             }
 
         // Methods of Potential implemented by this class.

@@ -71,6 +71,7 @@ endif()
 
 find_package(Boost 1.53.0 REQUIRED
   COMPONENTS
+  iostreams
   filesystem
   program_options
   system
