@@ -5,8 +5,11 @@
 
 namespace BubbleProfiler {
 
+static double renorm_scale = 246.;
+
 class Simple2DPotential : public ThermalPotential {
   public:
+
     virtual ~Simple2DPotential() = default;
     Simple2DPotential() = default;
 
@@ -34,7 +37,6 @@ class Simple2DPotential : public ThermalPotential {
     virtual std::vector<int> get_fermion_dof() override;
 
   private:
-    double renorm_scale = 246.;
     double v2=246.*246.;
     double m1=120.;
     double m2=50.;
