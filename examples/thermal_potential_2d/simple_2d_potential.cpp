@@ -7,8 +7,7 @@ double Simple2DPotential::V_tree(const Eigen::VectorXd &coords, double T = 0) {
     UNUSED(T);
     double x = coords(0);
     double y = coords(1);
-    double res = 0.25*l1*pow(pow(x,2)-v2,2)+0.25*l2*pow(pow(y,2)-v2,2)-mu2*x*y;
-    return res;
+    return 0.25*l1*pow(pow(x,2)-v2,2)+0.25*l2*pow(pow(y,2)-v2,2)-mu2*x*y;
 }
 
 double Simple2DPotential::V_daisy(const Eigen::VectorXd &coords, double T = 0) {

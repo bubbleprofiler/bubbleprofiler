@@ -3,7 +3,7 @@
 #include "simple_2d_potential.hpp"
 
 int main() {
-    BubbleProfiler::Simple2DPotential potential(1.0);
+    BubbleProfiler::Simple2DPotential potential(100.0);
     potential.init_effective_potential();
     std::shared_ptr<PhaseTracer::Effective_potential> effective_potential = potential.get_effective_potential();
     Eigen::VectorXd coord(2);
