@@ -87,21 +87,4 @@ int main() {
         plot_grid(grid, title.str());
         T += incr;
     }
-    
-    // potential.set_temperature(100.);
-
-    // std::vector<data_row> grid = potential.get_2d_potential_grid(axis_size, x_min, x_max, y_min, y_max);
-    // std::cout << "T = 100:\n";
-    // shift_to_zero(grid);
-    // plot_grid(grid, "T = 100");
-
-    // potential.set_temperature(0.);
-
-    // grid.clear();
-    // grid = potential.get_2d_potential_grid(axis_size, x_min, x_max, y_min, y_max);
-    // std::cout << "T = 0:\n";
-    // shift_to_zero(grid);
-    // plot_grid(grid, "T = 0");
-
-
 }
