@@ -5,9 +5,63 @@
 #include <limits>
 #include <stdio.h>
 #include "simple_2d_potential.hpp"
+#include "nlopt_optimizer.hpp"
 #include "gnuplot-iostream.h"
 
 typedef std::tuple<double, double, double> data_row;
+
+struct Thermal_Vacua {
+    Eigen::VectorXd true_vacuum;
+    Eigen::VectorXd false_vacuum;
+};
+
+Thermal_Vacua locate_vacua(BubbleProfiler::Simple2DPotential potential,
+    Eigen::VectorXd hint_false, Eigen::VectorXd hint_true, 
+    double bbox_size) {
+    
+    Thermal_Vacua vacua;
+
+    const auto v = [&potential](const Eigen::VectorXd& x) -> double {
+        return potential(x);
+    };
+
+    Eigen::VectorXd lower_bounds(2);
+    Eigen::VectorXd upper_bounds(2);
+
+    BubbleProfiler::NLopt_optimizer optimizer(v, 2);
+    optimizer.set_extremum_type(BubbleProfiler::NLopt_optimizer::Extremum_type::MIN);
+    optimizer.set_max_time(1.0);
+
+    // Locate false vacuum
+    lower_bounds << hint_false(0) - bbox_size, hint_false(1) - bbox_size;
+    upper_bounds << hint_false(0) + bbox_size, hint_false(1) + bbox_size;
+    optimizer.set_lower_bounds(lower_bounds);
+    optimizer.set_upper_bounds(upper_bounds);
+
+    auto status = optimizer.optimize(hint_false);
+    if (!BubbleProfiler::optimization_succeeded(status)) {
+        std::cerr << "Error: unable to locate false vacuum." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    vacua.false_vacuum = optimizer.get_extremum_location();
+
+    // Locate true vacuum
+    lower_bounds << hint_true(0) - bbox_size, hint_true(1) - bbox_size;
+    upper_bounds << hint_true(0) + bbox_size, hint_true(1) + bbox_size;
+    optimizer.set_lower_bounds(lower_bounds);
+    optimizer.set_upper_bounds(upper_bounds);
+
+    status = optimizer.optimize(hint_true);
+    if (!BubbleProfiler::optimization_succeeded(status)) {
+        std::cerr << "Error: unable to locate true vacuum." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    vacua.true_vacuum = optimizer.get_extremum_location();
+
+    return vacua;
+}
 
 double find_minimum(std::vector<data_row> grid) {
     double min = std::numeric_limits<double>::infinity();
@@ -58,10 +112,9 @@ void plot_grid(std::vector<data_row> grid, std::string title) {
     gp.send1d(grid);
 }
 
-int main() {
+void temperature_plots() {
     BubbleProfiler::Simple2DPotential potential(100.0);
     potential.init_effective_potential();
-    std::shared_ptr<PhaseTracer::Effective_potential> effective_potential = potential.get_effective_potential();
 
     double plot_scale = 2*246.;
     double x_min = -plot_scale;
@@ -87,4 +140,30 @@ int main() {
         plot_grid(grid, title.str());
         T += incr;
     }
+}
+
+void bounce_action() {
+    BubbleProfiler::Simple2DPotential potential(100.0);
+    potential.init_effective_potential();
+    potential.set_temperature(100.0);
+
+    Eigen::VectorXd hint_false(2);
+    hint_false(0) = 210.;
+    hint_false(1) = -150.;
+
+    Eigen::VectorXd hint_true(2);
+    hint_true(0) = 300.;
+    hint_true(1) = 350.;
+
+    double bbox_size = 200;
+
+    Thermal_Vacua vacua = locate_vacua(potential, hint_false, hint_true, bbox_size);
+
+    std::cout << "False vacuum: " << vacua.false_vacuum << "\n";
+    std::cout << "True vacuum: " << vacua.true_vacuum << "\n";
+}
+
+int main() {
+    // temperature_plots();
+    bounce_action();
 }
