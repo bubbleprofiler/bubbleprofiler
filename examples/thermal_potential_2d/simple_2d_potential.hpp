@@ -47,7 +47,8 @@ class Simple2DPotential : public ThermalPotential {
     double y1=0.1;
     double y2=0.15;
 
-    std::vector<int> boson_dof = {1,  1,  30 };
+    // std::vector<int> boson_dof = {1,  1,  30 };
+    std::vector<int> boson_dof = {1,  1,  15 };
     std::vector<double> boson_constants= {1.5,1.5,1.5};
     std::vector<int> fermion_dof{};
     size_t N_dim = 2;
