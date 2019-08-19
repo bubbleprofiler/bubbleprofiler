@@ -36,7 +36,7 @@ double ThermalPotential::partial(const Eigen::VectorXd& coords, int i, int j) co
     else {
         hess_cache_bad = false;
         hess_cache_l = internal_coords;
-        Eigen::VectorXd hess = effective_potential->d2V_dx2(internal_coords, T);
+        Eigen::MatrixXd hess = effective_potential->d2V_dx2(internal_coords, T);
         hess_cache_r = (basis_transform.transpose()) * hess * basis_transform;
 
         return hess_cache_r(i, j);
