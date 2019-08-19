@@ -92,7 +92,7 @@ int main(int argc, const char* argv[])
    }
 
    Field_profiles ansatz = guesser->get_profile_guess(
-      potential, true_vacuum, input.n_fields, -1.0, -1.0, 1.e-3, 100);
+      potential, true_vacuum, input.n_fields, -1.0, -1.0, 1.e-3, 1);
 
    double alpha = kink_guesser->get_alpha();
    std::cout << "Alpha: " << alpha << '\n';
