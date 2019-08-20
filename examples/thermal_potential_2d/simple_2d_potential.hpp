@@ -13,9 +13,15 @@ class Simple2DPotential : public ThermalPotential {
     virtual ~Simple2DPotential() = default;
     Simple2DPotential() = default;
 
-    Simple2DPotential(double m1_) : ThermalPotential(renorm_scale, 2) {
+    Simple2DPotential(double m1_, double m2_, double mu_, double Y1_, double Y2_) : ThermalPotential(renorm_scale, 2) {
         m1 = m1_;
-        l1 = 0.5*m1*m1/v2;
+        m2 = m2_;
+        l1=0.5*m1_*m1_/v2;
+        l2=0.5*m2_*m2_/v2;
+        mu = mu_;
+        mu2 = mu_*mu_;
+        y1 = Y1_;
+        y2 = Y2_;
     }
 
     virtual Simple2DPotential * clone() const override {
@@ -47,8 +53,7 @@ class Simple2DPotential : public ThermalPotential {
     double y1=0.1;
     double y2=0.15;
 
-    // std::vector<int> boson_dof = {1,  1,  30 };
-    std::vector<int> boson_dof = {1,  1,  15 };
+    std::vector<int> boson_dof = {1,  1,  30 };
     std::vector<double> boson_constants= {1.5,1.5,1.5};
     std::vector<int> fermion_dof{};
     size_t N_dim = 2;

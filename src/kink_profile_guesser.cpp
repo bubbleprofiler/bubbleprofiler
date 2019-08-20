@@ -365,11 +365,11 @@ void Kink_profile_guesser::calculate_potential_parameters(
    alpha = (r * trial_dist * trial_dist * (trial_dist - 1.5) + 0.5)
       / (1. - r * trial_dist * trial_dist * (2. - trial_dist * trial_dist));
 
-   if ((Abs(alpha) < alpha_threshold)) {
-      throw Thin_wall_error("Ansatz alpha = " + std::to_string(alpha) +
-         " < " + std::to_string(alpha_threshold) + " indicates thin walled "
-         "bubble; profiler will not converge");
-   }
+   // if ((Abs(alpha) < alpha_threshold)) {
+   //    throw Thin_wall_error("Ansatz alpha = " + std::to_string(alpha) +
+   //       " < " + std::to_string(alpha_threshold) + " indicates thin walled "
+   //       "bubble; profiler will not converge");
+   // }
 
    if ((Abs(alpha - 0.5) <= std::numeric_limits<double>::epsilon())
        || (Abs(alpha - 0.75) <= std::numeric_limits<double>::epsilon())) {
