@@ -11,4 +11,5 @@ ${RUN_POTENTIAL} \
          --output-path output \
          --domain-start 10e-8 \
          --local-minimum 0 0 \
-         --global-minimum 1.046372380884969 1.6634936817718957
+         --global-minimum 1.046372380884969 1.6634936817718957 \
+         --verbose
