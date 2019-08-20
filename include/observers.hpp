@@ -76,6 +76,8 @@ private:
    void write_action_to_file(const Field_profiles& profiles);
 };
 
+typedef std::vector<std::vector<double> > gp_profile_data;
+
 /*!
  * @class Plotting_observer
  * @brief Displays plots of field profiles at each step in the iteration.
@@ -83,17 +85,27 @@ private:
 class Plotting_observer {
 public:
 
-   Plotting_observer(const std::vector<std::string>& fields_) : fields(fields_) {};
+   Plotting_observer(
+      const std::vector<std::string>& fields_, 
+      bool last_only_ = true) : fields(fields_), last_only(last_only_) {
+         n_fields = fields_.size();
+      };
 
    Plotting_observer(const Plotting_observer&) = delete;
    Plotting_observer& operator=(const Plotting_observer&) = delete;
+   ~Plotting_observer();
 
    void operator()(const Field_profiles& profile,
                    const Field_profiles& perturbation);
 
    private:
-      int iteration_count{0};
       std::vector<std::string> fields{};
+      bool last_only;
+      int n_fields;
+      int iteration_count{0};
+      std::vector<gp_profile_data> profiles{};
+
+      void plot_profile_data(gp_profile_data profile_data, std::string plot_title);
 };
 
 } // namespace BubbleProfiler

@@ -119,7 +119,7 @@ int main(int argc, const char* argv[])
       profiler.calculate_bubble_profile(potential, observer);
    }
    else {
-      Plotting_observer observer(field_names);
+      Plotting_observer observer(field_names, false);
       profiler.calculate_bubble_profile(potential, observer);
    }
 
