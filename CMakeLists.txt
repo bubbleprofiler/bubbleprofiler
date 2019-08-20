@@ -71,6 +71,7 @@ endif()
 
 find_package(Boost 1.53.0 REQUIRED
   COMPONENTS
+  iostreams
   filesystem
   program_options
   system
@@ -115,7 +116,8 @@ add_library(bubbler
   src/logging_manager.cpp
   src/nlopt_optimizer.cpp
   src/numeric.cpp
-  src/observers.cpp
+  src/profile_observer.cpp
+  src/plotting_observer.cpp
   src/perturbations_ode_system.cpp
   src/relative_convergence_tester.cpp
   src/restricted_quartic_potential.cpp

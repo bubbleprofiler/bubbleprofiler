@@ -15,6 +15,7 @@
  * along with BubbleProfiler.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "observers.hpp"
 #include "gaussian_potential.hpp"
 #include "profile_guesser.hpp"
 #include "kink_profile_guesser.hpp"
@@ -118,7 +119,8 @@ int main(int argc, const char* argv[])
       profiler.calculate_bubble_profile(potential, observer);
    }
    else {
-      profiler.calculate_bubble_profile(potential);
+      Plotting_observer observer(field_names);
+      profiler.calculate_bubble_profile(potential, observer);
    }
 
    std::cout << "Action: " << profiler.get_euclidean_action() << '\n';
