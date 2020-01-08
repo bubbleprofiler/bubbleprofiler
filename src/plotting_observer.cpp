@@ -15,7 +15,7 @@ Plotting_observer::~Plotting_observer() {
         plot_profile_data(profiles.back(), "final profiles");
     }
     else {
-        for (int i = 0; i < profiles.size(); ++i) {
+        for (unsigned int i = 0; i < profiles.size(); ++i) {
             std::ostringstream title;
             title << "profiles for iteration " << i;
             plot_profile_data(profiles[i], title.str());

@@ -44,7 +44,7 @@ if(NOT BUBBLEPROFILER_INSTALL_CMAKE_DIR)
 endif()
 
 if(NOT BUBBLEPROFILER_INSTALL_INCLUDE_DIR)
-  set(BUBBLEPROFILER_INSTALL_INCLUDE_DIR include
+  set(BUBBLEPROFILER_INSTALL_INCLUDE_DIR include/BubbleProfiler
     CACHE PATH
     "The directory relative to CMAKE_INSTALL_PREFIX where BubbleProfiler headers are installed")
 endif()
