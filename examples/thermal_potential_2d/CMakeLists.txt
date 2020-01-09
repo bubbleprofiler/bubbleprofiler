@@ -1,9 +1,10 @@
 add_executable(thermal_potential_2d
-  simple_2d_plots.cpp
+  simple_2d_plots.cpp simple_2d_potential.cpp
 )
 
 target_link_libraries(thermal_potential_2d
   BubbleProfiler::bubbler
+  effpotential
 )
 
 if(ENABLE_COMPILER_WARNINGS)

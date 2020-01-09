@@ -13,7 +13,7 @@ namespace BubbleProfiler {
 
 // This is an abstract class which will only implement the Potential methods;
 // it is up to derived classes to impelement the Abstract_input_model methods.
-class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_model {
+class ThermalPotential : public Potential, public EffPotential::Abstract_input_model {
     public:
         virtual ~ThermalPotential() = default;
 
@@ -40,7 +40,7 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
             origin = Eigen::VectorXd::Zero(n_fields);
             origin_translation = origin;
             basis_transform = Eigen::MatrixXd::Identity(n_fields, n_fields);
-            effective_potential.reset(new PhaseTracer::Effective_potential(*this, renormalization_scale));
+            effective_potential.reset(new EffPotential::Effective_potential(*this));
         }
 
         void set_temperature(double T_) {
@@ -50,8 +50,12 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
         double get_temperature() {
             return T;
         }
+        
+        virtual double get_renormalization_scale() override {
+            return renormalization_scale;
+        }
 
-        std::shared_ptr<PhaseTracer::Effective_potential> get_effective_potential() {
+        std::shared_ptr<EffPotential::Effective_potential> get_effective_potential() {
             return effective_potential;
         }
 
@@ -59,7 +63,7 @@ class ThermalPotential : public Potential, public PhaseTracer::Abstract_input_mo
         double renormalization_scale;
         std::size_t n_fields;
         double T = 0;
-        std::shared_ptr<PhaseTracer::Effective_potential> effective_potential;
+        std::shared_ptr<EffPotential::Effective_potential> effective_potential;
 
         Eigen::VectorXd origin{};
         Eigen::VectorXd origin_translation{};
