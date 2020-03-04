@@ -13,6 +13,7 @@
 #include "field_profiles.hpp"
 #include "perturbative_profiler.hpp"
 #include "observers.hpp"
+#include "basic_logger.hpp"
 
 namespace BubbleProfiler {
 
@@ -128,14 +129,16 @@ void plot_grid(std::vector<data_row> grid, std::string title) {
     gp << "set xlabel 'x'\n";
     gp << "set ylabel 'y'\n";
     
-    gp << "plot '-' u 1:2:3 w image not, '/tmp/contour.txt' u 1:2 lc black w l not\n";
+    // gp << "plot '-' u 1:2:3 w image not, '/tmp/contour.txt' u 1:2 lc black w l not\n";
+    gp << "plot '-' u 1:2:3 w image not, '/tmp/contour.txt' u 1:2 w l not\n";
+
     gp.send1d(grid);
 }
 
 void temperature_plot(Simple2DPotential potential) {
     potential.init_effective_potential();
 
-    double plot_scale = 0.5*246.;
+    double plot_scale = 2*246.;
     double x_min = -plot_scale;
     double x_max = plot_scale;
     double y_min = -plot_scale;
@@ -155,7 +158,7 @@ void temperature_plot(Simple2DPotential potential) {
     plot_grid(grid, title.str());
 }
 
-void bounce_action(Simple2DPotential potential, Eigen::VectorXd true_vacuum, Eigen::VectorXd false_vacuum) {
+void bounce_action(Simple2DPotential potential, Eigen::VectorXd true_vacuum, Eigen::VectorXd false_vacuum, double step_size) {
 
     // Need to shift origin to false vacuum...
     potential.translate_origin(false_vacuum); 
@@ -175,7 +178,7 @@ void bounce_action(Simple2DPotential potential, Eigen::VectorXd true_vacuum, Eig
 
     double domain_start = -1;
     double domain_end = -1;
-    double initial_step_size = 0.1;
+    double initial_step_size = step_size;
     double interpolation_fraction = 0.1;
    
     Field_profiles ansatz = guesser->get_profile_guess(
@@ -213,32 +216,35 @@ void bounce_action(Simple2DPotential potential, Eigen::VectorXd true_vacuum, Eig
 }
 
 int main() {
-    // defaults:
-    // m1=120.,m2=50.,mu=25.,Y1=.1,Y2=.15,n=30
-
-    // Apparrently thin-walled; doesn't look that way in CT tho...
-    // double m1 = 100.;
-    // double m2 = 15.;
-    // double mu = 5.;
-    // double Y1 = .1;
-    // double Y2 = .05;
-    // double T = 143.25583145081288;
-    // double n = 30;
-
-    double m1 = 100.;
-    double m2 = 1000.;
-    double mu = 1.;
-    double Y1 = 1.5;
-    double Y2 = 0.1;
-    double n = 20.;
-
-    double T = 446.57253007284504;
-
     Eigen::VectorXd true_vacuum(2);
     Eigen::VectorXd false_vacuum(2);
 
-    true_vacuum << -1.0050165385478342, 30.092270255699813;
-    false_vacuum << -1.1443615902688836e-06, -1.8884352387298626e-07;
+    // defaults:
+    // m1=120.,m2=50.,mu=25.,Y1=.1,Y2=.15,n=30
+
+    // This one works!
+    double m1 = 120.;
+    double m2 = 50.;
+    double mu = 20.;
+    double Y1 = .1;
+    double Y2 = .15;
+    int n = 30.;
+    double T = 78.;
+    true_vacuum << 283.513, 376.851;
+    false_vacuum << 236.032, -182.918;
+    double step_size = 0.001;
+
+    // Curved case - fails with oscillating corrections
+    // double m1 = 120.;
+    // double m2 = 50.;
+    // double mu = 2.;
+    // double Y1 = 1.;
+    // double Y2 = .15;
+    // int n = 30.;
+    // double T = 78.;
+    // true_vacuum << 255.389, 291.075;
+    // false_vacuum << 260.894, -320.952;
+    // double step_size = 0.0001;
 
     BubbleProfiler::Simple2DPotential potential(m1, m2, mu, Y1, Y2, n);
     potential.set_temperature(T);
@@ -247,7 +253,10 @@ int main() {
     // BubbleProfiler::temperature_plot(potential);
 
     try {
-        BubbleProfiler::bounce_action(potential, true_vacuum, false_vacuum);
+        using namespace BubbleProfiler;
+        auto& logging_manager = logging::Logging_manager::get_manager();
+        logging_manager.set_minimum_log_level(logging::Log_level::Trace);
+        bounce_action(potential, true_vacuum, false_vacuum, step_size);
     }
     catch (const std::exception& e) {
         std::cerr << "Exception:  " <<  e.what() << std::endl;
