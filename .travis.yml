@@ -23,7 +23,7 @@ matrix:
             - libgsl0-dev
       compiler: gcc
       env:
-        - MATRIX_EVAL="CC=gcc-7.4 && CXX=g++-7.4"
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
     - name: "clang build"
       os: linux
       compiler: clang
