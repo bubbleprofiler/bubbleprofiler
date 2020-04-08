@@ -1,7 +1,7 @@
 BubbleProfiler
 ==============
 
-[![Build Status](https://travis-ci.com/bubbleprofiler/bubbleprofiler.svg?branch=development)](https://travis-ci.com/bubbleprofiler/bubbleprofiler)
+[![Build Status](https://travis-ci.com/bubbleprofiler/bubbleprofiler.svg?branch=master)](https://travis-ci.com/bubbleprofiler/bubbleprofiler)
 
 BubbleProfiler is a C++ library for calculating the bounce solution
 and Euclidean action associated with a cosmological phase transition.
