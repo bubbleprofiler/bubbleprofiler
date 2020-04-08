@@ -15,7 +15,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7.4
+            - g++-7
             - libboost-all-dev
             - libeigen3-dev
             - libginac-dev
