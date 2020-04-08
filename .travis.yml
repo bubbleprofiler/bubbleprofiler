@@ -15,7 +15,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-4.8
+            - g++-7.4
             - libboost-all-dev
             - libeigen3-dev
             - libginac-dev
@@ -23,7 +23,7 @@ matrix:
             - libgsl0-dev
       compiler: gcc
       env:
-        - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+        - MATRIX_EVAL="CC=gcc-7.4 && CXX=g++-7.4"
     - name: "clang build"
       os: linux
       compiler: clang
@@ -31,16 +31,16 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
+            - llvm-toolchain-precise-7.0
           packages:
-            - clang-3.6
+            - clang-7
             - libboost-all-dev
             - libeigen3-dev
             - libginac-dev
             - libnlopt-dev
             - libgsl0-dev
       env:
-        - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+        - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
 
 before_install:
   - eval "${MATRIX_EVAL}"
