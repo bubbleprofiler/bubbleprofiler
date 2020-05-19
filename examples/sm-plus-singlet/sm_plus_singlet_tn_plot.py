@@ -1,4 +1,4 @@
-from __future__ import print_function
+# from __future__ import print_function
 
 import sys
 import argparse
@@ -39,6 +39,9 @@ def get_plot_data(min_temp, max_temp, num_points, Tc, lambda_m, lambda_s, retry)
 
 
 if __name__ == "__main__":
+    if sys.version_info[0] < 3:
+        raise Exception("This script must be run using Python 3")
+
     parser = argparse.ArgumentParser(description='Generate a plot of S_E/T for an instance of the SM+Singlet model')
 
     parser.add_argument("--min-temp", type=float, default=0.0,

@@ -21,7 +21,7 @@ lambda_h = (Mh**2)/(2.0*vEW**2) # Higgs quartic coupling
 # Path to this script
 bp_bin_path = os.path.realpath(os.path.dirname(__file__))
 # Path to CLI tool
-cli_tool = bp_bin_path + "/run_cmd_line_potential@CMAKE_EXECUTABLE_SUFFIX@"
+cli_tool = bp_bin_path + "/run_cmd_line_potential.x"
 
 # Returns a dict containing the potential string and the vacua locations
 def generate_potential(T, Tc, lambda_m, lambda_s):
@@ -99,15 +99,14 @@ def run_profiler(data, step_size=0.0001, verbose=False):
 
     if verbose:
         command = command + ["--verbose"]
-    #print "COMMAND: " + " ".join(command)
 
     cli_output = subprocess.check_output(command).splitlines()
 
     action = None
 
     for entry in cli_output:
-        if entry.startswith("# Action"):
-            action = float(entry.split(" ")[2])
+        if entry.startswith(b"# Action"):
+            action = float(entry.split(b" ")[2])
 
     return {"cli_output" : cli_output, "action": action}
 
