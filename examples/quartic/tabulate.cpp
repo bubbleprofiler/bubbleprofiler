@@ -203,12 +203,9 @@ Profiler_result run_shooting_profiler(
    const double true_min = potential.get_global_minimum_location();
 
    Shooting profiler;
-   profiler.set_bisection_precision_bits(5);
-   profiler.set_action_arrived_rel(1.e-3);
+   profiler.set_bisection_precision_bits(15);
    profiler.set_shooting_abs_tol(1.e-4);
    profiler.set_shooting_rel_tol(1.e-4);
-   profiler.set_action_abs_tol(1.e-6);
-   profiler.set_action_rel_tol(1.e-6);
    profiler.set_drho_frac(1.e-3);
    profiler.set_bisect_lambda_max(5);
    profiler.set_max_iterations(100000);

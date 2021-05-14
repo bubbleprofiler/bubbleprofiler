@@ -385,7 +385,7 @@ double Shooting::shoot(double lambda)
       }
       
       // Contribution to action from trapezoid rule
-      const double f_b = integrand(v, rho);
+      const double f_b = integrand(y[1], rho);
 
       // Don't use \f$d\rho\f$ as it is updated in place
       action_no_prefactor += 0.5 * (f_a + f_b) * (rho - rho_a);
@@ -443,7 +443,7 @@ double Shooting::integrand(double dot_phi, double rho) const
 
 double Shooting::action()
 {
-   return interior(lambda_sol) + area_n_sphere(dim - 1) * action_no_prefactor;
+   return area_n_sphere(dim - 1) * (action_no_prefactor + interior(lambda_sol));
 }
 
 Field_profiles Shooting::calculate_bubble_profile()
