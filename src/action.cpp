@@ -67,11 +67,8 @@ extern "C" double action(const double E,
 
     Shooting one_dim;
     one_dim.set_bisection_precision_bits(settings.shoot_bisect_bits);
-    one_dim.set_action_arrived_rel(settings.action_arrived_rel);
     one_dim.set_shooting_abs_tol(settings.shoot_ode_abs);
     one_dim.set_shooting_rel_tol(settings.shoot_ode_rel);
-    one_dim.set_action_abs_tol(settings.action_ode_abs);
-    one_dim.set_action_rel_tol(settings.action_ode_rel);
     one_dim.set_drho_frac(settings.drho_frac);
     one_dim.set_bisect_lambda_max(settings.bisect_lambda_max);
     one_dim.set_max_iterations(settings.iter_max);

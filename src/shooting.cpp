@@ -112,15 +112,12 @@ void Shooting::solve(
    lambda_sol = shooting();
 
    if (compute_action) {
-      action_stepper
-         = make_controlled(action_ode_rel, action_ode_abs,
-                           error_stepper_type());
-      euclidean_action = action(lambda_sol);
+      euclidean_action = action();
       action_computed = true;
    }
 
    if (compute_profile) {
-      profiles = calculate_bubble_profile(lambda_sol);
+      profiles = calculate_bubble_profile();
       profile_computed = true;
    }
 }
@@ -296,6 +293,11 @@ double Shooting::shoot(double lambda)
 
    const double phi_zero = unmap(lambda);
 
+   // Reset action integral and profiles
+   action_no_prefactor = 0.;
+   rho_vals.clear();
+   field_vals.clear();
+
    // Trivial cases - don't check them explicitly as may get stuck on
    // tops of maxima.
    if (std::isinf(lambda)) {
@@ -330,6 +332,13 @@ double Shooting::shoot(double lambda)
    state_type y {{evolved[1], evolved[2]}};
    double drho = drho_guess;
    const double rho_max = rho + periods_max * scale;
+   
+   // Initialize integral
+   double f_a = integrand(y[1], rho);
+
+   // Initialize profile
+   rho_vals = {rho};
+   field_vals = {y[0]};
 
    for (int iter = 0; iter < iter_max; ++iter) {
       // Check for whether we reached an unacceptable value of \f$\rho\f$
@@ -342,7 +351,7 @@ double Shooting::shoot(double lambda)
 
       const double x = y[0];
       const double v = y[1];
-
+      
       // Check whether we have gone past the true vacuum. This must come first,
       // as we could go past the true vacuum and then run out of energy etc.
       const bool overshot = sign_min * (x - false_min) > 0.;
@@ -365,11 +374,28 @@ double Shooting::shoot(double lambda)
          return under;
       }
 
+      // Note \f$\rho\f$ - about to be updated in place
+      const double rho_a = rho;
+
       // Step forward in \f$\rho\f$ and update \f$d\rho\f$ in place.
       // The while loop isn't strictly necessary but avoids repeating the
       // above checks.
+      
       while (shoot_stepper.try_step(ode_, y, rho, drho)) {
       }
+      
+      // Contribution to action from trapezoid rule
+      const double f_b = integrand(v, rho);
+
+      // Don't use \f$d\rho\f$ as it is updated in place
+      action_no_prefactor += 0.5 * (f_a + f_b) * (rho - rho_a);
+
+      // Cache integrand
+      f_a = f_b;
+      
+      // Cache profile
+      rho_vals.push_back(rho);
+      field_vals.push_back(y[0]);
    }
 
    throw Numerical_error("Could not determine whether shot was an undershot or "
@@ -415,141 +441,17 @@ double Shooting::integrand(double dot_phi, double rho) const
    return pow(dot_phi, 2) * pow(rho, dim - 1) / dim;
 }
 
-double Shooting::action(double lambda)
+double Shooting::action()
 {
-   const double phi_zero = unmap(lambda);
-
-   // Reset stepper
-   action_stepper.reset();
-
-   const auto ode_ = [this](const state_type& x, state_type& dxdt, double rho) {
-      return this->ode(x, dxdt, rho);
-   };
-
-   // Evolve guess of \f$\phi_0\f$ forward using approximate solution,
-   // resulting in initial conditions.
-   evolve_type evolved = evolve(lambda);
-   double rho = evolved[0];  // \f$\hat\rho\f$
-   // \f$\phi(\hat\rho)\f$ and \f$\dot\phi(\hat\rho)\f$
-   state_type y {{evolved[1], evolved[2]}};
-   double drho = drho_guess;
-   const double rho_max = rho + periods_max * scale;
-
-   // Integrate action along bubble profile
-   double x = y[0];
-   double v = y[1];
-
-   double action_no_prefactor = interior(lambda);
-   double f_a = integrand(v, rho);
-
-   int iter = 0;
-   for (iter = 0; iter < iter_max; ++iter) {
-      // Check for whether we reached an unacceptable value of \f$\rho\f$
-      if (rho >= rho_max ||
-          Abs(drho) <= std::numeric_limits<double>::epsilon()) {
-         throw Numerical_error(
-            "Could not determine whether shot was an undershot or "
-            "overshot in action");
-      }
-
-      // Break if over or under shoot, or close to false minimum.
-      const bool overshot = sign_min * (x - false_min) > 0.;
-      const bool undershot = sign_min * v < 0.;
-      const bool arrived = Abs((x - false_min) / (phi_zero - false_min))
-                                            < action_arrived_rel;
-
-      if (overshot || undershot || arrived) {
-         break;
-      }
-
-      // Step forward in \f$\rho\f$ and update \f$d\rho\f$ in place.
-      const double rho_a = rho;
-      while (action_stepper.try_step(ode_, y, rho, drho)) {
-      }
-
-      // Contribution to action from trapezoid rule
-      x = y[0];
-      v = y[1];
-
-      double f_b = integrand(v, rho);
-
-      // Don't use \f$d\rho\f$ as it is updated in place
-      action_no_prefactor += 0.5 * (f_a + f_b) * (rho - rho_a);
-
-      // Cache integrand
-      f_a = f_b;
-   }
-
-   if (iter == iter_max) {
-      throw Numerical_error(
-         "Could not determine whether shot was an undershot or "
-         "overshot in action");
-   }
-
-   const double action = area_n_sphere(dim - 1) * action_no_prefactor;
-
-   return action;
+   return interior(lambda_sol) + area_n_sphere(dim - 1) * action_no_prefactor;
 }
 
-Field_profiles Shooting::calculate_bubble_profile(double lambda)
+Field_profiles Shooting::calculate_bubble_profile()
 {
-   const double phi_zero = unmap(lambda);
-   evolve_type evolved = evolve(lambda);
-   double rho_crit = evolved[0];
-   state_type y{{evolved[1], evolved[2]}};
-
-   const auto ode_ = [this](const state_type& x, state_type& dxdt, double rho) {
-      return this->ode(x, dxdt, rho);
-   };
-
-   std::vector<double> rho_vals = {rho_crit};
-   std::vector<double> field_vals = {y[0]};
-
-   double drho = drho_guess;
-   double rho = rho_crit;
-   const double rho_max = rho + periods_max * scale;
-   controlled_stepper_type profiles_stepper
-      = make_controlled(action_ode_rel, action_ode_abs,
-                        error_stepper_type());
-
-   int iter = 0;
-   for (iter = 0; iter < iter_max; ++iter) {
-      // Check for whether we reached an unacceptable value of \f$\rho\f$
-      if (rho >= rho_max ||
-          Abs(drho) <= std::numeric_limits<double>::epsilon()) {
-         throw Numerical_error(
-            "Could not determine whether shot was an undershot or "
-            "overshot in profile");
-      }
-
-      // Break if over or under shoot, or close to false minimum
-      const bool overshot = sign_min * (y[0] - false_min) > 0.;
-      const bool undershot = sign_min * y[1] < 0.;
-      const bool arrived = Abs((y[0] - false_min) / (phi_zero - false_min))
-                                               < action_arrived_rel;
-
-      if (overshot || undershot || arrived) {
-         break;
-      }
-
-      // Step forward in \f$\rho\f$ and update \f$d\rho\f$ in place
-      while (profiles_stepper.try_step(ode_, y, rho, drho)) {
-      }
-
-      rho_vals.push_back(rho);
-      field_vals.push_back(y[0]);
-   }
-
-   if (iter == iter_max) {
-      throw Numerical_error(
-         "Could not determine whether shot was an undershot or "
-         "overshot in profile");
-   }
-
    // Use solution assuming quadratic potential inside bubble
    const std::size_t num_integration_points = rho_vals.size();
    const std::size_t num_interior_points = num_integration_points / 2;
-   const double rho_step = rho_crit / num_interior_points;
+   const double rho_step = rho_vals[0] / num_interior_points;
 
    Eigen::VectorXd rho_values(Eigen::VectorXd::Zero(num_interior_points
                                                     + num_integration_points));

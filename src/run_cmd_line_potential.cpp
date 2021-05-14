@@ -81,8 +81,6 @@ const int default_shoot_bisect_bits = 5;
 const double default_action_arrived_rel = 1.e-3;
 const double default_shoot_ode_abs = 1.e-4;
 const double default_shoot_ode_rel = 1.e-4;
-const double default_action_ode_abs = 1.e-6;
-const double default_action_ode_rel = 1.e-6;
 const double default_drho_frac = 1.e-3;
 const double default_evolve_change_rel = 1.e-2;
 const double default_bisect_lambda_max = 5.0;
@@ -126,8 +124,6 @@ struct Bubble_profiler_inputs {
    double action_arrived_rel;
    double shoot_ode_abs;
    double shoot_ode_rel;
-   double action_ode_abs;
-   double action_ode_rel;
    double drho_frac;
    double evolve_change_rel;
    double bisect_lambda_max;
@@ -222,10 +218,6 @@ Bubble_profiler_inputs parse_cmd_line_args(int argc, const char* argv[])
        "1D shooting: absolute error tolerance for ODE integrator (bubble profile)")
       ("shoot-ode-rel", po::value<double>(&input.shoot_ode_rel)->default_value(default_shoot_ode_rel),
        "1D shooting: relative error tolerance for ODE integrator (bubble profile)")
-      ("action-ode-abs", po::value<double>(&input.action_ode_abs)->default_value(default_action_ode_abs),
-       "1D shooting: absolute error tolerance for ODE integrator (action integral)")
-      ("action-ode-rel", po::value<double>(&input.action_ode_rel)->default_value(default_action_ode_rel),
-       "1D shooting: relative error tolerance for ODE integrator (action integral)")
       ("drho-frac", po::value<double>(&input.drho_frac)->default_value(default_drho_frac),
        "1D shooting: initial step size relative to characteristic bubble scale")
       ("evolve-change-rel", po::value<double>(&input.evolve_change_rel)->default_value(default_evolve_change_rel),
@@ -559,11 +551,8 @@ std::tuple<double, Field_profiles> run_shooting_profiler(
    Shooting solver;
 
    solver.set_bisection_precision_bits(input.shoot_bisect_bits);
-   solver.set_action_arrived_rel(input.action_arrived_rel);
    solver.set_shooting_abs_tol(input.shoot_ode_abs);
    solver.set_shooting_rel_tol(input.shoot_ode_rel);
-   solver.set_action_abs_tol(input.action_ode_abs);
-   solver.set_action_rel_tol(input.action_ode_rel);
    solver.set_drho_frac(input.drho_frac);
    solver.set_evolve_change_rel(input.evolve_change_rel);
    solver.set_bisect_lambda_max(input.bisect_lambda_max);

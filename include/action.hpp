@@ -34,11 +34,8 @@ namespace BubbleProfiler {
 
 struct Shooting_settings {
    int shoot_bisect_bits{5};
-   double action_arrived_rel{1.e-3};
    double shoot_ode_abs{1.e-4};
    double shoot_ode_rel{1.e-4};
-   double action_ode_abs{1.e-6};
-   double action_ode_rel{1.e-6};
    double drho_frac{1.e-3};
    double evolve_change_rel{1.e-2};
    double bisect_lambda_max{5};

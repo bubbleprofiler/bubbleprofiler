@@ -51,16 +51,10 @@ public:
 
    /** Bits of precision in bisection of \f$\phi_0\f$ */
    void set_bisection_precision_bits(int b) { shoot_bisect_bits = b; }
-   /** Relative tolerance for judging when\f$\phi \approx \phi_f\f$ */
-   void set_action_arrived_rel(double tol) { action_arrived_rel = tol; }
    /** Absolute tolerance in ODE solver for a shot */
    void set_shooting_abs_tol(double tol) { shoot_ode_abs = tol; }
    /** Relative tolerance in ODE solver for a shot */
    void set_shooting_rel_tol(double tol) { shoot_ode_rel = tol; }
-   /** Absolute tolerance in ODE solver for action integral */
-   void set_action_abs_tol(double tol) { action_ode_abs = tol; }
-    /** Relative tolerance in ODE solver for action integral */
-   void set_action_rel_tol(double tol) { action_ode_rel = tol; }
    /** The initial ODE step size, \f$d\rho\f$, is this fraction of the bubble scale */
    void set_drho_frac(double frac) { drho_frac = frac; }
    /**
@@ -160,18 +154,15 @@ private:
 
    /** Potential, \f$V(\phi)\f$ */
    std::function<double(double)> potential{nullptr};
-    /** Derivative of potential, \f$V^{\prime}(\phi)\f$ */
+   /** Derivative of potential, \f$V^{\prime}(\phi)\f$ */
    std::function<double(double)> potential_first{nullptr};
    /** Second derivative of potential, \f$V^{\prime\prime}(\phi)\f$ */
    std::function<double(double)> potential_second{nullptr};
 
    // Tolerances and integration method settings
    int shoot_bisect_bits{5};
-   double action_arrived_rel{1.e-3};
    double shoot_ode_abs{1.e-4};
    double shoot_ode_rel{1.e-4};
-   double action_ode_abs{1.e-6};
-   double action_ode_rel{1.e-6};
    double drho_frac{1.e-3};
    double evolve_change_rel{1.e-2};
    double bisect_lambda_max{5.};
@@ -180,6 +171,13 @@ private:
    double f_y_max{1.e6};
    double f_y_min{1.e-3};
    double y_max{1.e1};
+
+   /** Action wihtout pre-factor */
+   double action_no_prefactor{0.};
+
+   /** Field profile */
+   std::vector<double> rho_vals;
+   std::vector<double> field_vals;
 
    void initialize_potential_parameters(
       const std::function<double(double)>& potential_,
@@ -305,13 +303,13 @@ private:
    double integrand(double dot_phi, double rho) const;
 
   /** @returns Action, \f$S\f$ */
-   double action(double lambda);
+   double action();
 
    /** @returns Action without prefactor for interior of bubble */
    double interior(double lambda);
 
    /** @returns The bubble profile, \f$\phi(\rho)\f$ */
-   Field_profiles calculate_bubble_profile(double lambda);
+   Field_profiles calculate_bubble_profile();
 };
 
 }  // namespace BubbleProfiler
