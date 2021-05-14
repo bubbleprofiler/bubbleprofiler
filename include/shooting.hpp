@@ -36,8 +36,12 @@
 #include <boost/numeric/odeint.hpp>
 
 #include <functional>
+#include <vector>
 
 namespace BubbleProfiler {
+
+
+enum class Shot { over, under };
 
 class Potential;
 
@@ -265,7 +269,7 @@ private:
       @param lambda \f$\lambda\f$
       @returns Whether overshot or undershot
    */
-   double shoot(double lambda);
+   Shot shoot(double lambda);
 
    /** @returns \f$\phi\f$ from \f$\lambda\f$  */
    double unmap(double lambda) const;
@@ -275,10 +279,8 @@ private:
 
       Bisect between over and under shots, beginning from the interval
       \f$(\phi_b, \phi_t)\f$.
-
-      @returns \f$\lambda\f$ corresponding to \f$\phi_0\f$
    */
-   double shooting();
+   void shooting();
 
    /**
       @brief Action integrand from kinetic term without pre-factor
@@ -310,6 +312,10 @@ private:
 
    /** @returns The bubble profile, \f$\phi(\rho)\f$ */
    Field_profiles calculate_bubble_profile();
+
+   /** Bisection method for shooting */
+   void bisect(double lower, double upper,
+                  double action_lower, double action_upper);
 };
 
 }  // namespace BubbleProfiler

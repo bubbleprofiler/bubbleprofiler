@@ -18,7 +18,7 @@
 /**
     @file
     @brief One-dimensional shooting method
-    
+
     Solve a one-dimensional bounce problem with the shooting method.
 */
 
@@ -27,8 +27,6 @@
 #include "math_wrappers.hpp"
 #include "numeric.hpp"
 #include "potential.hpp"
-
-#include <boost/math/tools/minima.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -109,7 +107,7 @@ void Shooting::solve(
                         error_stepper_type());
 
    // Solve initial value problem
-   lambda_sol = shooting();
+   shooting();
 
    if (compute_action) {
       euclidean_action = action();
@@ -274,7 +272,7 @@ Shooting::evolve_type Shooting::evolve(double lambda) const
 double Shooting::bubble_scale() const
 {
    const double mass_squared = potential_second(barrier);
-   if(mass_squared >= 0.0 || std::isnan(mass_squared) || std::isinf(mass_squared)  ) {
+   if (mass_squared >= 0.0 || std::isnan(mass_squared) || std::isinf(mass_squared)) {
       throw Numerical_error(
          "Double derivative at the barrier (a local maximum) is not a negative finite number.");
    }
@@ -286,11 +284,8 @@ double Shooting::energy(double phi, double dot_phi) const
    return 0.5 * pow(dot_phi, 2) - (potential(phi) - p_false_min);
 }
 
-double Shooting::shoot(double lambda)
+Shot Shooting::shoot(double lambda)
 {
-   constexpr double over = 1.;
-   constexpr double under = -1.;
-
    const double phi_zero = unmap(lambda);
 
    // Reset action integral and profiles
@@ -301,9 +296,9 @@ double Shooting::shoot(double lambda)
    // Trivial cases - don't check them explicitly as may get stuck on
    // tops of maxima.
    if (std::isinf(lambda)) {
-      return over;
+      return Shot::over;
    } else if (phi_zero == false_min) {
-      return under;
+      return Shot::under;
    }
 
    // Check there is sufficient energy to make a shot before evolving
@@ -313,7 +308,7 @@ double Shooting::shoot(double lambda)
    const bool no_energy = energy(x, v) < 0.;
 
    if (no_energy) {
-      return under;
+      return Shot::under;
    }
 
    // Reset stepper
@@ -332,7 +327,7 @@ double Shooting::shoot(double lambda)
    state_type y {{evolved[1], evolved[2]}};
    double drho = drho_guess;
    const double rho_max = rho + periods_max * scale;
-   
+
    // Initialize integral
    double f_a = integrand(y[1], rho);
 
@@ -351,27 +346,27 @@ double Shooting::shoot(double lambda)
 
       const double x = y[0];
       const double v = y[1];
-      
+
       // Check whether we have gone past the true vacuum. This must come first,
       // as we could go past the true vacuum and then run out of energy etc.
       const bool overshot = sign_min * (x - false_min) > 0.;
 
       if (overshot) {
-         return over;
+         return Shot::over;
       }
 
       // Check whether there is sufficient energy to make a shot
       const bool no_energy = energy(x, v) < 0.;
 
       if (no_energy) {
-         return under;
+         return Shot::under;
       }
 
       // Check whether we are moving in the wrong direction
       const bool undershot = sign_min * v < 0.;
 
       if (undershot) {
-         return under;
+         return Shot::under;
       }
 
       // Note \f$\rho\f$ - about to be updated in place
@@ -380,10 +375,10 @@ double Shooting::shoot(double lambda)
       // Step forward in \f$\rho\f$ and update \f$d\rho\f$ in place.
       // The while loop isn't strictly necessary but avoids repeating the
       // above checks.
-      
+
       while (shoot_stepper.try_step(ode_, y, rho, drho)) {
       }
-      
+
       // Contribution to action from trapezoid rule
       const double f_b = integrand(y[1], rho);
 
@@ -392,7 +387,7 @@ double Shooting::shoot(double lambda)
 
       // Cache integrand
       f_a = f_b;
-      
+
       // Cache profile
       rho_vals.push_back(rho);
       field_vals.push_back(y[0]);
@@ -407,33 +402,82 @@ double Shooting::unmap(double lambda) const
    return Exp(-lambda) * (barrier - true_min) + true_min;
 }
 
-double Shooting::shooting()
+void Shooting::bisect(double lower, double upper, double action_lower, double action_upper)
 {
-   const auto shoot_ = [this](double l) { return this->shoot(l); };
-   std::pair<double, double> solution;
-   boost::math::tools::eps_tolerance<double> stop(shoot_bisect_bits);
-   double lower = 0.;
-   double upper = bisect_lambda_max;
-   double interval = bisect_lambda_max;
+  while (true)
+  {
+      double middle = (lower + upper) * 0.5;
+      Shot shot_middle = shoot(middle);
 
-   // Try to find a root with bisection method between lower and upper.
-   // If no solution is found, shift the range.
+      // Stopping conditions
+      double action_rel_tol = 1e-2;
+      double action_abs_tol = 1e6;
+      const bool stop_bisect_bits = Abs(lower - upper) < std::pow(2., 1 - shoot_bisect_bits);
+      const bool stop_action = Abs(action_lower - action_upper) < std::min(action_abs_tol, 0.5 * action_rel_tol * (action_lower + action_upper));
 
-   for (int iter = 0; iter < iter_max; ++iter) {
-      try {
-         solution = boost::math::tools::bisect(shoot_, lower, upper, stop);
-      } catch (boost::exception & e) {
-         interval *= 2.;
-         lower = upper;
-         upper += interval;
-         continue;
+      if (stop_bisect_bits || stop_action)
+      {
+        lambda_sol = middle;
+        break;
       }
-      return 0.5 * (solution.first + solution.second);
-   }
 
-   throw Numerical_error("No solution found from bisect after reaching "
-                         + std::to_string(iter_max)
-                         + " attempts extending the range.");
+      // Iteration of bisection
+
+      if (shot_middle == Shot::under) {
+        lower = middle;
+        action_lower = action_no_prefactor;
+      }
+      else
+      {
+        upper = middle;
+        action_upper = action_no_prefactor;
+      }
+  }
+}
+
+void Shooting::shooting()
+{
+    double lower = 0.;
+    double upper = bisect_lambda_max;
+    double interval = bisect_lambda_max;
+
+    // Try to find a root with bisection method between lower and upper.
+    // If no solution is found, shift the range.
+
+    Shot shot_lower = shoot(lower);
+    double action_lower = action_no_prefactor;
+    Shot shot_upper = shoot(upper);
+    double action_upper = action_no_prefactor;
+
+    if (shot_lower != Shot::under)
+    {
+      throw Numerical_error("Did not find a undershot");
+    }
+
+    for (int iter = 0; iter < iter_max; ++iter)
+    {
+        if (shot_upper == Shot::over)
+        {
+          break;
+        }
+
+        interval *= 2.;
+        lower = upper;
+        shot_lower = shot_upper;
+        action_lower = action_upper;
+        upper += interval;
+        shot_upper = shoot(upper);
+        action_upper = action_no_prefactor;
+    }
+
+    if (shot_upper != Shot::over)
+    {
+      throw Numerical_error("No solution found from bisect after reaching "
+                           + std::to_string(iter_max)
+                           + " attempts extending the range.");
+    }
+
+    bisect(lower, upper, action_lower, action_upper);
 }
 
 double Shooting::integrand(double dot_phi, double rho) const
